@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 8px; margin-bottom: 10px; background-color: #f4f4f4; }
+        #messages { margin: 0; padding: 0; height: 300px; overflow-y: scroll; }
+        #messageForm { position: fixed; bottom: 0; width: 100%; }
+        #messageInput { width: 80%; padding: 10px; }
+        #sendButton { width: 20%; padding: 10px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <ul id="messages"></ul>
+    <form id="messageForm" action="">
+        <input id="messageInput" autocomplete="off" placeholder="Type a message..." />
+        <button id="sendButton">Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Listen for form submission to send a message
+        const form = document.getElementById('messageForm');
+        const input = document.getElementById('messageInput');
+        const messages = document.getElementById('messages');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        });
+
+        // Listen for incoming messages and display them
+        socket.on('chat message', (msg) => {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    </script>
+</body>
+</html>
